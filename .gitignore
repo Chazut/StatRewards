@@ -1,0 +1,12 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.DotSettings.user
+*.dll
+*.pdb
+*.zip
+
+# Progress files (per-profile, generated at runtime)
+progress/
