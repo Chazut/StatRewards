@@ -2,6 +2,10 @@
   // Set to true for verbose logging
   "debug": false,
 
+  // Global multiplier applied to all milestone thresholds
+  // 0.5 = rewards twice as often, 2.0 = rewards half as often
+  "threshold_multiplier": 1.0,
+
   // Milestone definitions
   //
   // reward_pool entries support two modes:

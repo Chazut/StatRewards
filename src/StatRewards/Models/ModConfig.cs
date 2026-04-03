@@ -3,6 +3,7 @@ namespace StatRewards.Models;
 public record ModConfig
 {
     public bool debug { get; init; } = false;
+    public double threshold_multiplier { get; init; } = 1.0; // Global multiplier applied to all milestone "every" values
     public List<MilestoneDefinition> milestones { get; init; } = new();
 }
 
