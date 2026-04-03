@@ -1,0 +1,688 @@
+{
+  // Set to true for verbose logging
+  "debug": false,
+
+  // Milestone definitions
+  //
+  // reward_pool entries support two modes:
+  //   1. category-based (random from DB):  { "category": "meds", "weight": 3 }
+  //   2. specific item:                    { "template_id": "5449016a...", "min_stack": 1000, "max_stack": 5000, "weight": 2 }
+  //
+  // Available categories:
+  //   "meds"           — random medkit, drug, or stimulator
+  //   "ammo"           — random ammunition
+  //   "food"           — random food item
+  //   "drink"          — random drink item
+  //   "keys"           — random mechanical key
+  //   "barter"         — random barter item
+  //   "weapon_preset"  — random weapon with full mod preset (attachments included)
+  //   "gear"           — random armor, rig, helmet, or backpack
+  //   "money"          — roubles (use min_stack/max_stack for amount range)
+  //
+  // divisor: set to 100 for Float-type counters stored as value*100 in the profile
+  //   Affected stats: CauseArmorDamage, CauseBodyDamage, CombatDamage, Heal, BloodLoss, BodyPartDamage.*
+  //
+  // Trader IDs for "sender":
+  //   Prapor:      54cb50c76803fa8b248b4571
+  //   Therapist:   54cb57776803fa99248b456e
+  //   Fence:       579dc571d53a0658a154fbec
+  //   Skier:       58330581ace78e27b8b10cee
+  //   Peacekeeper: 5935c25fb3acc3127c3d8cd9
+  //   Mechanic:    5a7c2eca46aef81a7ca2145d
+  //   Ragman:      5ac3b934156ae10c4430e83c
+  //   Jaeger:      5c0647fdd443bc2504c2d371
+
+  "milestones": [
+    {
+      "id": "novice_hunter",
+      "stat_key": "Kills",
+      "every": 25,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Not bad for a rookie. Here, keep going.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "meds", "weight": 4 },
+        { "category": "ammo", "weight": 3 },
+        { "category": "money", "min_stack": 10000, "max_stack": 30000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "headhunter",
+      "stat_key": "HeadShots",
+      "every": 15,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Precision is an art. Well done.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 5 },
+        { "category": "weapon_preset", "weight": 1 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "marathon_runner",
+      "stat_key": "Pedometer",
+      "every": 25000,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "Even the wolves can't match your endurance.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "food", "weight": 3 },
+        { "category": "drink", "weight": 3 },
+        { "category": "meds", "weight": 2 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "blood_donor",
+      "stat_key": "BloodLoss",
+      "every": 50,
+      "divisor": 100,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "You should be dead. Several times over.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "meds", "weight": 6 },
+        { "category": "drink", "weight": 2 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 1 }
+      ]
+    },
+    {
+      "id": "pmc_slayer",
+      "stat_key": "KilledPmc",
+      "every": 15,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "PMCs fear you now. Keep it up.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 2 },
+        { "category": "gear", "weight": 2 },
+        { "category": "money", "min_stack": 30000, "max_stack": 75000, "weight": 3 },
+        { "category": "keys", "weight": 1 }
+      ]
+    },
+    {
+      "id": "survivor",
+      "stat_key": "ExitStatus",
+      "stat_subkey": "Survived",
+      "every": 10,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Few survive as long as you have.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "money", "min_stack": 30000, "max_stack": 100000, "weight": 4 },
+        { "category": "barter", "weight": 3 },
+        { "category": "weapon_preset", "weight": 1 }
+      ]
+    },
+    {
+      "id": "lead_spitter",
+      "stat_key": "AmmoUsed",
+      "every": 1000,
+      "sender": "5a7c2eca46aef81a7ca2145d",
+      "message": "You keep the business running.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 5 },
+        { "category": "weapon_preset", "weight": 2 },
+        { "category": "money", "min_stack": 15000, "max_stack": 35000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "scavenger",
+      "stat_key": "BodiesLooted",
+      "every": 25,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "Quick fingers, huh?",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "barter", "weight": 4 },
+        { "category": "keys", "weight": 2 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 3 }
+      ]
+    },
+    {
+      "id": "boss_hunter",
+      "stat_key": "KilledBoss",
+      "every": 3,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "Even the bosses fall before you.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "gear", "weight": 3 },
+        { "category": "keys", "weight": 2 },
+        { "category": "money", "min_stack": 50000, "max_stack": 150000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "dehydration_survivor",
+      "stat_key": "Dehydrations",
+      "every": 5,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "Drink some water, I'm begging you.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "drink", "weight": 5 },
+        { "category": "food", "weight": 3 },
+        { "category": "meds", "weight": 2 }
+      ]
+    },
+    {
+      "id": "bullet_sponge",
+      "stat_key": "CombatDamage",
+      "every": 5000,
+      "divisor": 100,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "How are you still alive?",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "meds", "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "patch_me_up",
+      "stat_key": "Heal",
+      "every": 2500,
+      "divisor": 100,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "You could have been a doctor...",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "meds", "weight": 5 },
+        { "category": "money", "min_stack": 10000, "max_stack": 30000, "weight": 3 },
+        { "category": "barter", "weight": 1 }
+      ]
+    },
+    {
+      "id": "armor_breaker",
+      "stat_key": "CauseArmorDamage",
+      "every": 5000,
+      "divisor": 100,
+      "sender": "5a7c2eca46aef81a7ca2145d",
+      "message": "No armor can stop you.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+
+    // --- Advanced combat ---
+    {
+      "id": "knife_maniac",
+      "stat_key": "KilledWithKnife",
+      "every": 5,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "A true savage.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "meds", "weight": 3 },
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "grenadier",
+      "stat_key": "KilledWithThrowWeapon",
+      "every": 10,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "BOOM. Nice.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "barter", "weight": 4 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 3 },
+        { "category": "gear", "weight": 2 }
+      ]
+    },
+    {
+      "id": "sniper_elite",
+      "stat_key": "LongShots",
+      "every": 5,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Long range specialist. Impressive.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "spray_and_pray",
+      "stat_key": "KilledWithMachineGun",
+      "every": 15,
+      "sender": "5a7c2eca46aef81a7ca2145d",
+      "message": "Brrrrt. The music of war.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 5 },
+        { "category": "ammo", "weight": 3 },
+        { "category": "weapon_preset", "weight": 1 }
+      ]
+    },
+    {
+      "id": "shotgun_surgeon",
+      "stat_key": "KilledWithShotgun",
+      "every": 15,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "Effective at close range.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "ammo", "weight": 4 },
+        { "category": "meds", "weight": 2 }
+      ]
+    },
+
+    // --- Survival & Health ---
+    {
+      "id": "bones_of_steel",
+      "stat_key": "Fractures",
+      "every": 10,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "You should see an orthopedist.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "meds", "weight": 6 },
+        { "category": "money", "min_stack": 10000, "max_stack": 25000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "iron_stomach",
+      "stat_key": "UsedFoods",
+      "every": 15,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "At least you eat well.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "food", "weight": 3 },
+        { "category": "drink", "weight": 3 },
+        { "category": "barter", "weight": 2 }
+      ]
+    },
+
+    // --- Loot & Economy ---
+    {
+      "id": "safe_cracker",
+      "stat_key": "SafeLooted",
+      "every": 15,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "Lucky hands.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "keys", "weight": 4 },
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 4 },
+        { "category": "barter", "weight": 2 }
+      ]
+    },
+    {
+      "id": "rat_king",
+      "stat_key": "BartItems",
+      "every": 100,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "The rat king.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "barter", "weight": 5 },
+        { "category": "keys", "weight": 2 },
+        { "category": "money", "min_stack": 25000, "max_stack": 60000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "millionaire",
+      "stat_key": "Money",
+      "stat_subkey": "RUB",
+      "every": 1000000,
+      "sender": "5ac3b934156ae10c4430e83c",
+      "message": "Money attracts money, my friend.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "keys", "weight": 2 }
+      ]
+    },
+    {
+      "id": "key_collector",
+      "stat_key": "Keys",
+      "every": 10,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "You open a lot of doors.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "keys", "weight": 5 },
+        { "category": "keys", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 2 }
+      ]
+    },
+
+    // --- Exploration & Raids ---
+    {
+      "id": "tourist",
+      "stat_key": "Triggers",
+      "every": 25,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "You know every corner.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "keys", "weight": 4 },
+        { "category": "barter", "weight": 3 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "time_in_tarkov",
+      "stat_key": "LifeTime",
+      "stat_subkey": "Pmc",
+      "every": 18000,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Time flies in Tarkov.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+    {
+      "id": "die_hard",
+      "stat_key": "Deaths",
+      "every": 10,
+      "sender": "54cb57776803fa99248b456e",
+      "message": "You again on my table...",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "meds", "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "win_streak",
+      "stat_key": "LongestWinStreak",
+      "stat_subkey": "Pmc",
+      "every": 5,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Unbeatable. Here's your reward.",
+      "reward_count": 3,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "gear", "weight": 3 },
+        { "category": "money", "min_stack": 50000, "max_stack": 150000, "weight": 3 }
+      ]
+    },
+
+    // --- KilledWith by weapon type ---
+    {
+      "id": "pistolero",
+      "stat_key": "KilledWithPistol",
+      "every": 15,
+      "sender": "5a7c2eca46aef81a7ca2145d",
+      "message": "Style and efficiency.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "ammo", "weight": 4 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "smg_specialist",
+      "stat_key": "KilledWithSmg",
+      "every": 15,
+      "sender": "58330581ace78e27b8b10cee",
+      "message": "Compact and deadly.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+    {
+      "id": "rifleman",
+      "stat_key": "KilledWithAssaultRifle",
+      "every": 25,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "The soldier's weapon.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+    {
+      "id": "carbine_expert",
+      "stat_key": "KilledWithAssaultCarbine",
+      "every": 15,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Light and fast. Good choice.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "marksman",
+      "stat_key": "KilledWithMarksmanRifle",
+      "every": 15,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Precision at range.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "sniper",
+      "stat_key": "KilledWithSniperRifle",
+      "every": 15,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "Patience and discipline.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "grenade_launcher_pro",
+      "stat_key": "KilledWithGrenadeLauncher",
+      "every": 5,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Heavy artillery.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 3 },
+        { "category": "gear", "weight": 2 }
+      ]
+    },
+
+    // --- By faction ---
+    {
+      "id": "bear_hunter",
+      "stat_key": "KilledBear",
+      "every": 15,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Taking out Bears. Good work.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "gear", "weight": 4 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+    {
+      "id": "usec_eliminator",
+      "stat_key": "KilledUsec",
+      "every": 15,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "The Americans are falling.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 4 },
+        { "category": "ammo", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "scav_exterminator",
+      "stat_key": "KilledSavage",
+      "every": 50,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "The zone is safer thanks to you.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "barter", "weight": 4 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 3 },
+        { "category": "meds", "weight": 2 }
+      ]
+    },
+
+    // --- Accuracy & Misc ---
+    {
+      "id": "accuracy_king",
+      "stat_key": "HitCount",
+      "every": 250,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Each shot counts.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "ammo", "weight": 4 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "body_wrecker",
+      "stat_key": "BodyPartsDestroyed",
+      "every": 15,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "War surgeon.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "meds", "weight": 4 },
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 2 }
+      ]
+    },
+    {
+      "id": "weapons_hoarder",
+      "stat_key": "Weapons",
+      "every": 25,
+      "sender": "5a7c2eca46aef81a7ca2145d",
+      "message": "You have enough for an army.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 4 },
+        { "category": "money", "min_stack": 20000, "max_stack": 60000, "weight": 3 },
+        { "category": "gear", "weight": 2 }
+      ]
+    },
+    {
+      "id": "equipment_collector",
+      "stat_key": "Equipments",
+      "every": 50,
+      "sender": "5ac3b934156ae10c4430e83c",
+      "message": "You could open a shop.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "gear", "weight": 4 },
+        { "category": "barter", "weight": 3 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "dollar_man",
+      "stat_key": "Money",
+      "stat_subkey": "USD",
+      "every": 2500,
+      "sender": "5935c25fb3acc3127c3d8cd9",
+      "message": "Uncle Sam appreciates your business.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "gear", "weight": 3 },
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "euro_trader",
+      "stat_key": "Money",
+      "stat_subkey": "EUR",
+      "every": 2500,
+      "sender": "58330581ace78e27b8b10cee",
+      "message": "A man of taste.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "gear", "weight": 3 },
+        { "category": "barter", "weight": 3 },
+        { "category": "money", "min_stack": 30000, "max_stack": 80000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "door_kicker",
+      "stat_key": "ExpDoorBreached",
+      "every": 250,
+      "sender": "54cb50c76803fa8b248b4571",
+      "message": "Subtlety? Never heard of it.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "weapon_preset", "weight": 3 },
+        { "category": "ammo", "weight": 4 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 2 }
+      ]
+    },
+    {
+      "id": "locksmith",
+      "stat_key": "ExpDoorUnlocked",
+      "every": 250,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "Every door has its key.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "keys", "weight": 5 },
+        { "category": "money", "min_stack": 20000, "max_stack": 50000, "weight": 3 },
+        { "category": "barter", "weight": 2 }
+      ]
+    },
+    {
+      "id": "scav_raider",
+      "stat_key": "Sessions",
+      "stat_subkey": "Scav",
+      "every": 10,
+      "sender": "579dc571d53a0658a154fbec",
+      "message": "You're one of mine now.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "barter", "weight": 4 },
+        { "category": "money", "min_stack": 15000, "max_stack": 40000, "weight": 3 },
+        { "category": "keys", "weight": 2 }
+      ]
+    },
+    {
+      "id": "hydration_expert",
+      "stat_key": "UsedDrinks",
+      "every": 15,
+      "sender": "5c0647fdd443bc2504c2d371",
+      "message": "Well hydrated, well armed.",
+      "reward_count": 2,
+      "reward_pool": [
+        { "category": "drink", "weight": 3 },
+        { "category": "food", "weight": 3 },
+        { "category": "barter", "weight": 2 }
+      ]
+    }
+  ]
+}

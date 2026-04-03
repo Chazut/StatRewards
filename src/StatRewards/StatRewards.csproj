@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>StatRewards</AssemblyName>
+    <Version>1.0.0</Version>
+    <RootNamespace>StatRewards</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SPT_DIR>C:\Games\SPT-4.0\SPT</SPT_DIR>
+  </PropertyGroup>
+
+  <!-- Copy config folder into Release output -->
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <None Include="..\..\config\**\*.*">
+      <Link>config\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>config\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </None>
+  </ItemGroup>
+
+  <!-- SPT 4.0 server references via MSBuild property SPT_DIR -->
+  <ItemGroup Condition="'$(SPT_DIR)' != ''">
+    <Reference Include="SPTarkov.Server.Core">
+      <HintPath>$(SPT_DIR)\SPTarkov.Server.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SPTarkov.DI">
+      <HintPath>$(SPT_DIR)\SPTarkov.DI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SPTarkov.Common">
+      <HintPath>$(SPT_DIR)\SPTarkov.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SPT.Server">
+      <HintPath>$(SPT_DIR)\SPT.Server.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SemanticVersioning">
+      <HintPath>$(SPT_DIR)\SemanticVersioning.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Require SPT_DIR -->
+  <Target Name="EnsureSptDirProvided" BeforeTargets="Build">
+    <Error Condition="'$(SPT_DIR)' == ''" Text="SPT_DIR must be set (path to SPT server DLLs) to build this project." />
+  </Target>
+
+  <!-- Deploy mod to SPT after build -->
+  <PropertyGroup>
+    <ModDeployDir>$(SPT_DIR)\user\mods\StatRewards</ModDeployDir>
+  </PropertyGroup>
+
+  <Target Name="DeployMod" AfterTargets="Build" Condition="Exists('$(ModDeployDir)')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDeployDir)" SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="[StatRewards] Deployed DLL to $(ModDeployDir)" />
+  </Target>
+
+  <Target Name="DeployModAssets" AfterTargets="Build" Condition="Exists('$(ModDeployDir)')">
+    <ItemGroup>
+      <ConfigFiles Include="..\..\config\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ConfigFiles)" DestinationFiles="@(ConfigFiles->'$(ModDeployDir)\config\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
