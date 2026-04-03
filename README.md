@@ -6,7 +6,7 @@ An SPT 4.0 server mod that sends random mail rewards when players hit stat miles
 
 - **48 milestones** covering kills, damage, healing, looting, economy, exploration, and weapon-type stats
 - **Category-based random rewards** — meds, ammo, gear, keys, barter items, money, food, drinks
-- **Weapon preset rewards** — random weapons with full mod attachments from SPT's preset database
+- **Weapon rewards with attachments** — weapons come with their default preset (stock configuration with base mods)
 - **Armor preset rewards** — armor with plates and inserts included
 - **Full ammo stacks** — ammo rewards always give a complete stack
 - **Per-profile progress tracking** — no retroactive reward flood on first install
