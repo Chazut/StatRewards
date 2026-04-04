@@ -39,6 +39,7 @@
   "milestones": [
     {
       "id": "novice_hunter",
+      "name": "Novice Hunter",
       "stat_key": "Kills",
       "every": 25,
       "sender": "54cb50c76803fa8b248b4571",
@@ -52,6 +53,7 @@
     },
     {
       "id": "headhunter",
+      "name": "Headhunter",
       "stat_key": "HeadShots",
       "every": 15,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -65,6 +67,7 @@
     },
     {
       "id": "marathon_runner",
+      "name": "Marathon Runner",
       "stat_key": "Pedometer",
       "every": 25000,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -79,6 +82,7 @@
     },
     {
       "id": "blood_donor",
+      "name": "Blood Donor",
       "stat_key": "BloodLoss",
       "every": 50,
       "divisor": 100,
@@ -93,6 +97,7 @@
     },
     {
       "id": "pmc_slayer",
+      "name": "PMC Slayer",
       "stat_key": "KilledPmc",
       "every": 15,
       "sender": "54cb50c76803fa8b248b4571",
@@ -107,6 +112,7 @@
     },
     {
       "id": "survivor",
+      "name": "Survivor",
       "stat_key": "ExitStatus",
       "stat_subkey": "Survived",
       "every": 10,
@@ -121,6 +127,7 @@
     },
     {
       "id": "lead_spitter",
+      "name": "Lead Spitter",
       "stat_key": "AmmoUsed",
       "every": 1000,
       "sender": "5a7c2eca46aef81a7ca2145d",
@@ -134,6 +141,7 @@
     },
     {
       "id": "scavenger",
+      "name": "Scavenger",
       "stat_key": "BodiesLooted",
       "every": 25,
       "sender": "579dc571d53a0658a154fbec",
@@ -147,6 +155,7 @@
     },
     {
       "id": "boss_hunter",
+      "name": "Boss Hunter",
       "stat_key": "KilledBoss",
       "every": 3,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -161,6 +170,7 @@
     },
     {
       "id": "dehydration_survivor",
+      "name": "Dehydration Survivor",
       "stat_key": "Dehydrations",
       "every": 5,
       "sender": "54cb57776803fa99248b456e",
@@ -174,6 +184,7 @@
     },
     {
       "id": "bullet_sponge",
+      "name": "Bullet Sponge",
       "stat_key": "CombatDamage",
       "every": 5000,
       "divisor": 100,
@@ -188,6 +199,7 @@
     },
     {
       "id": "patch_me_up",
+      "name": "Patch Me Up",
       "stat_key": "Heal",
       "every": 2500,
       "divisor": 100,
@@ -202,6 +214,7 @@
     },
     {
       "id": "armor_breaker",
+      "name": "Armor Breaker",
       "stat_key": "CauseArmorDamage",
       "every": 5000,
       "divisor": 100,
@@ -218,6 +231,7 @@
     // --- Advanced combat ---
     {
       "id": "knife_maniac",
+      "name": "Knife Maniac",
       "stat_key": "KilledWithKnife",
       "every": 5,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -231,6 +245,7 @@
     },
     {
       "id": "grenadier",
+      "name": "Grenadier",
       "stat_key": "KilledWithThrowWeapon",
       "every": 10,
       "sender": "54cb50c76803fa8b248b4571",
@@ -244,6 +259,7 @@
     },
     {
       "id": "sniper_elite",
+      "name": "Sniper Elite",
       "stat_key": "LongShots",
       "every": 5,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -257,6 +273,7 @@
     },
     {
       "id": "spray_and_pray",
+      "name": "Spray & Pray",
       "stat_key": "KilledWithMachineGun",
       "every": 15,
       "sender": "5a7c2eca46aef81a7ca2145d",
@@ -270,6 +287,7 @@
     },
     {
       "id": "shotgun_surgeon",
+      "name": "Shotgun Surgeon",
       "stat_key": "KilledWithShotgun",
       "every": 15,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -285,6 +303,7 @@
     // --- Survival & Health ---
     {
       "id": "bones_of_steel",
+      "name": "Bones of Steel",
       "stat_key": "Fractures",
       "every": 10,
       "sender": "54cb57776803fa99248b456e",
@@ -297,6 +316,7 @@
     },
     {
       "id": "iron_stomach",
+      "name": "Iron Stomach",
       "stat_key": "UsedFoods",
       "every": 15,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -312,6 +332,7 @@
     // --- Loot & Economy ---
     {
       "id": "safe_cracker",
+      "name": "Safe Cracker",
       "stat_key": "SafeLooted",
       "every": 15,
       "sender": "579dc571d53a0658a154fbec",
@@ -325,6 +346,7 @@
     },
     {
       "id": "rat_king",
+      "name": "Rat King",
       "stat_key": "BartItems",
       "every": 100,
       "sender": "579dc571d53a0658a154fbec",
@@ -338,6 +360,7 @@
     },
     {
       "id": "millionaire",
+      "name": "Millionaire",
       "stat_key": "Money",
       "stat_subkey": "RUB",
       "every": 1000000,
@@ -352,6 +375,7 @@
     },
     {
       "id": "key_collector",
+      "name": "Key Collector",
       "stat_key": "Keys",
       "every": 10,
       "sender": "579dc571d53a0658a154fbec",
@@ -367,6 +391,7 @@
     // --- Exploration & Raids ---
     {
       "id": "tourist",
+      "name": "Tourist",
       "stat_key": "Triggers",
       "every": 25,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -380,6 +405,7 @@
     },
     {
       "id": "time_in_tarkov",
+      "name": "Time in Tarkov",
       "stat_key": "LifeTime",
       "stat_subkey": "Pmc",
       "every": 18000,
@@ -394,6 +420,7 @@
     },
     {
       "id": "die_hard",
+      "name": "Die Hard",
       "stat_key": "Deaths",
       "every": 10,
       "sender": "54cb57776803fa99248b456e",
@@ -407,6 +434,7 @@
     },
     {
       "id": "win_streak",
+      "name": "Win Streak",
       "stat_key": "LongestWinStreak",
       "stat_subkey": "Pmc",
       "every": 5,
@@ -423,6 +451,7 @@
     // --- KilledWith by weapon type ---
     {
       "id": "pistolero",
+      "name": "Pistolero",
       "stat_key": "KilledWithPistol",
       "every": 15,
       "sender": "5a7c2eca46aef81a7ca2145d",
@@ -436,6 +465,7 @@
     },
     {
       "id": "smg_specialist",
+      "name": "SMG Specialist",
       "stat_key": "KilledWithSmg",
       "every": 15,
       "sender": "58330581ace78e27b8b10cee",
@@ -449,6 +479,7 @@
     },
     {
       "id": "rifleman",
+      "name": "Rifleman",
       "stat_key": "KilledWithAssaultRifle",
       "every": 25,
       "sender": "54cb50c76803fa8b248b4571",
@@ -462,6 +493,7 @@
     },
     {
       "id": "carbine_expert",
+      "name": "Carbine Expert",
       "stat_key": "KilledWithAssaultCarbine",
       "every": 15,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -475,6 +507,7 @@
     },
     {
       "id": "marksman",
+      "name": "Marksman",
       "stat_key": "KilledWithMarksmanRifle",
       "every": 15,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -488,6 +521,7 @@
     },
     {
       "id": "sniper",
+      "name": "Sniper",
       "stat_key": "KilledWithSniperRifle",
       "every": 15,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -501,6 +535,7 @@
     },
     {
       "id": "grenade_launcher_pro",
+      "name": "Grenade Launcher Pro",
       "stat_key": "KilledWithGrenadeLauncher",
       "every": 5,
       "sender": "54cb50c76803fa8b248b4571",
@@ -516,6 +551,7 @@
     // --- By faction ---
     {
       "id": "bear_hunter",
+      "name": "Bear Hunter",
       "stat_key": "KilledBear",
       "every": 15,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -529,6 +565,7 @@
     },
     {
       "id": "usec_eliminator",
+      "name": "Usec Eliminator",
       "stat_key": "KilledUsec",
       "every": 15,
       "sender": "54cb50c76803fa8b248b4571",
@@ -542,6 +579,7 @@
     },
     {
       "id": "scav_exterminator",
+      "name": "Scav Exterminator",
       "stat_key": "KilledSavage",
       "every": 50,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -557,6 +595,7 @@
     // --- Accuracy & Misc ---
     {
       "id": "accuracy_king",
+      "name": "Accuracy King",
       "stat_key": "HitCount",
       "every": 250,
       "sender": "5935c25fb3acc3127c3d8cd9",
@@ -570,6 +609,7 @@
     },
     {
       "id": "body_wrecker",
+      "name": "Body Wrecker",
       "stat_key": "BodyPartsDestroyed",
       "every": 15,
       "sender": "5c0647fdd443bc2504c2d371",
@@ -583,6 +623,7 @@
     },
     {
       "id": "weapons_hoarder",
+      "name": "Weapons Hoarder",
       "stat_key": "Weapons",
       "every": 25,
       "sender": "5a7c2eca46aef81a7ca2145d",
@@ -596,6 +637,7 @@
     },
     {
       "id": "equipment_collector",
+      "name": "Equipment Collector",
       "stat_key": "Equipments",
       "every": 50,
       "sender": "5ac3b934156ae10c4430e83c",
@@ -609,6 +651,7 @@
     },
     {
       "id": "dollar_man",
+      "name": "Dollar Man",
       "stat_key": "Money",
       "stat_subkey": "USD",
       "every": 2500,
@@ -623,6 +666,7 @@
     },
     {
       "id": "euro_trader",
+      "name": "Euro Trader",
       "stat_key": "Money",
       "stat_subkey": "EUR",
       "every": 2500,
@@ -637,6 +681,7 @@
     },
     {
       "id": "door_kicker",
+      "name": "Door Kicker",
       "stat_key": "ExpDoorBreached",
       "every": 250,
       "sender": "54cb50c76803fa8b248b4571",
@@ -650,6 +695,7 @@
     },
     {
       "id": "locksmith",
+      "name": "Locksmith",
       "stat_key": "ExpDoorUnlocked",
       "every": 250,
       "sender": "579dc571d53a0658a154fbec",
@@ -663,6 +709,7 @@
     },
     {
       "id": "scav_raider",
+      "name": "Scav Raider",
       "stat_key": "Sessions",
       "stat_subkey": "Scav",
       "every": 10,
@@ -677,6 +724,7 @@
     },
     {
       "id": "hydration_expert",
+      "name": "Hydration Expert",
       "stat_key": "UsedDrinks",
       "every": 15,
       "sender": "5c0647fdd443bc2504c2d371",

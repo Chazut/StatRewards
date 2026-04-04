@@ -69,14 +69,24 @@ public sealed class MilestoneRouter(
                     ? milestone.sender
                     : "54cb50c76803fa8b248b4571"; // Prapor fallback
 
+                // Calculate milestone number from saved progress
+                var effectiveEvery = Math.Max(1, (long)(milestone.every * state.Config.threshold_multiplier));
+                var milestoneNumber = progress.milestones.TryGetValue(milestone.id, out var threshold)
+                    ? threshold / effectiveEvery
+                    : 0;
+
+                // Build mail message: name + number + custom message
+                var displayName = !string.IsNullOrEmpty(milestone.name) ? milestone.name : milestone.id;
+                var mailMessage = $"{displayName} — Milestone #{milestoneNumber}\n\n{milestone.message}";
+
                 mailSend.SendDirectNpcMessageToPlayer(
                     sessionId,
                     sender,
                     MessageType.MessageWithItems,
-                    milestone.message,
+                    mailMessage,
                     items);
 
-                logger.Info($"[StatRewards] '{milestone.id}' triggered {times}x for {profileId}, sent {items.Count} item(s) via {sender}");
+                logger.Info($"[StatRewards] '{milestone.id}' #{milestoneNumber} triggered {times}x for {profileId}, sent {items.Count} item(s) via {sender}");
             }
         }
         catch (Exception ex)

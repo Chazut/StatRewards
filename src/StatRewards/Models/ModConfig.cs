@@ -10,6 +10,7 @@ public record ModConfig
 public record MilestoneDefinition
 {
     public string id { get; init; } = "";
+    public string name { get; init; } = ""; // Display name shown in mail (e.g. "Novice Hunter")
     public string stat_key { get; init; } = "";
     public string? stat_subkey { get; init; }
     public int every { get; init; } = 25;
