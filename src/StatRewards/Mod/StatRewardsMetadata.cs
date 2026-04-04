@@ -10,7 +10,7 @@ public sealed record StatRewardsMetadata : AbstractModMetadata
     public override string Name { get; init; } = "StatRewards";
     public override string Author { get; init; } = "Chazut";
     public override List<string>? Contributors { get; init; } = null;
-    public override SemVerVersion Version { get; init; } = new("1.0.0");
+    public override SemVerVersion Version { get; init; } = new("1.1.0");
     public override SemVerRange SptVersion { get; init; } = new("~4.0.0");
     public override List<string>? Incompatibilities { get; init; } = null;
     public override Dictionary<string, SemVerRange>? ModDependencies { get; init; } = null;
