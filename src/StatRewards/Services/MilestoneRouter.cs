@@ -75,9 +75,12 @@ public sealed class MilestoneRouter(
                     ? threshold / effectiveEvery
                     : 0;
 
-                // Build mail message: name + number + custom message
+                // Build mail message: name + number + stat + custom message
                 var displayName = !string.IsNullOrEmpty(milestone.name) ? milestone.name : milestone.id;
-                var mailMessage = $"{displayName} — Milestone #{milestoneNumber}\n\n{milestone.message}";
+                var statDisplay = milestone.stat_subkey != null
+                    ? $"{milestone.stat_key} > {milestone.stat_subkey}"
+                    : milestone.stat_key;
+                var mailMessage = $"{displayName} — Milestone #{milestoneNumber}\n[{statDisplay}: {threshold:N0}]\n\n{milestone.message}";
 
                 mailSend.SendDirectNpcMessageToPlayer(
                     sessionId,
