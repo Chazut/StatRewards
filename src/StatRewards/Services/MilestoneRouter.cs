@@ -80,7 +80,7 @@ public sealed class MilestoneRouter(
                 var statDisplay = milestone.stat_subkey != null
                     ? $"{milestone.stat_key} > {milestone.stat_subkey}"
                     : milestone.stat_key;
-                var mailMessage = $"{displayName} — Milestone #{milestoneNumber}\n[{statDisplay}: {threshold:N0}]\n\n{milestone.message}";
+                var mailMessage = $"{displayName} — Milestone x{milestoneNumber}\n[{statDisplay}: {threshold:N0}]\n\n{milestone.message}";
 
                 mailSend.SendDirectNpcMessageToPlayer(
                     sessionId,

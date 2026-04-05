@@ -84,7 +84,7 @@
       "id": "blood_donor",
       "name": "Blood Donor",
       "stat_key": "BloodLoss",
-      "every": 50,
+      "every": 200,
       "divisor": 100,
       "sender": "54cb57776803fa99248b456e",
       "message": "You should be dead. Several times over.",
