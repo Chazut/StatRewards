@@ -1,4 +1,7 @@
 # StatRewards
+![Stars](https://img.shields.io/github/stars/Chazut/StatRewards?style=flat-square&label=STARS&color=007ec6)
+![Issues](https://img.shields.io/github/issues/Chazut/StatRewards?style=flat-square&label=ISSUES&color=44cc11)
+![Downloads](https://img.shields.io/github/downloads/Chazut/StatRewards/total?style=flat-square&label=DOWNLOADS&color=44cc11)
 
 An SPT 4.0 server mod that sends random mail rewards when players hit stat milestones. Repeatable, fully configurable via JSONC.
 
