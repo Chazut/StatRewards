@@ -1,11 +1,11 @@
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Items;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Enums;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Common.Models.Logging;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 using SPTarkov.Server.Core.Utils;
 using StatRewards.Models;
 
@@ -14,7 +14,7 @@ namespace StatRewards.Services;
 [Injectable]
 public sealed class RewardGenerator
 {
-    private readonly DatabaseService _db;
+    private readonly TemplateTable _templates;
     private readonly ItemHelper _itemHelper;
     private readonly PresetHelper _presetHelper;
     private readonly RandomUtil _randomUtil;
@@ -61,13 +61,13 @@ public sealed class RewardGenerator
     private const string RoublesTpl = "5449016a4bdc2d6f028b456f";
 
     public RewardGenerator(
-        DatabaseService db,
+        TemplateTable templates,
         ItemHelper itemHelper,
         PresetHelper presetHelper,
         RandomUtil randomUtil,
         ISptLogger<RewardGenerator> logger)
     {
-        _db = db;
+        _templates = templates;
         _itemHelper = itemHelper;
         _presetHelper = presetHelper;
         _randomUtil = randomUtil;
@@ -261,7 +261,7 @@ public sealed class RewardGenerator
         if (!CategoryBaseClasses.TryGetValue(category, out var baseClassIds) || baseClassIds.Length == 0)
             return new List<MongoId>();
 
-        var items = _db.GetItems();
+        var items = _templates.Items;
         var pool = new List<MongoId>();
 
         foreach (var kvp in items)
@@ -286,7 +286,7 @@ public sealed class RewardGenerator
 
     private List<MongoId> BuildWeaponPresetPool()
     {
-        var items = _db.GetItems();
+        var items = _templates.Items;
         var pool = new List<MongoId>();
 
         foreach (var kvp in items)
@@ -323,8 +323,7 @@ public sealed class RewardGenerator
 
     private int GetMaxStackSize(string templateId)
     {
-        var tables = _db.GetTables();
-        if (tables?.Templates?.Items?.TryGetValue(templateId, out var template) == true)
+        if (_templates.Items.TryGetValue(templateId, out var template))
             return template.Properties?.StackMaxSize ?? 1;
         return 1;
     }

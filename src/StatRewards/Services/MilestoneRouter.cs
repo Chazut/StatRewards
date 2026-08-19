@@ -1,11 +1,11 @@
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Enums;
-using SPTarkov.Server.Core.Models.Spt.Server;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Common.Models.Logging;
+using SPTarkov.Server.Core.Services.Commerce;
 using SPTarkov.Server.Core.Utils;
 
 namespace StatRewards.Services;
@@ -26,9 +26,9 @@ public sealed class MilestoneRouter(
     State state,
     ISptLogger<MilestoneRouter> logger
 ) : StaticRouter(jsonUtil, [
-    new RouteAction<object>(
+    new RouteAction<EmptyRequestData>(
         "/client/game/profile/list",
-        (url, requestData, sessionId, output) =>
+        (url, requestData, sessionId, output, cancellationToken) =>
             ProcessProfileList(sessionId, output, profileHelper, mailSend,
                 statChecker, rewardGenerator, progressStore, state, logger)
     )

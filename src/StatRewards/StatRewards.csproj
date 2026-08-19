@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SPT_DIR>C:\Games\SPT-4.0\SPT</SPT_DIR>
+    <SPT_DIR>C:\Games\SPT-4.1\SPT_Runtime</SPT_DIR>
   </PropertyGroup>
 
   <!-- Copy config folder into Release output -->
@@ -22,7 +22,7 @@
     </None>
   </ItemGroup>
 
-  <!-- SPT 4.0 server references via MSBuild property SPT_DIR -->
+  <!-- SPT 4.1 server references via MSBuild property SPT_DIR -->
   <ItemGroup Condition="'$(SPT_DIR)' != ''">
     <Reference Include="SPTarkov.Server.Core">
       <HintPath>$(SPT_DIR)\SPTarkov.Server.Core.dll</HintPath>

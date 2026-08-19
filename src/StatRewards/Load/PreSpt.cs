@@ -1,12 +1,12 @@
 using System.Reflection;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
-using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Common.Models.Logging;
 using StatRewards.Services;
 
 namespace StatRewards.Load;
 
-[Injectable(TypePriority = OnLoadOrder.PreSptModLoader + 10)]
+[Injectable(TypePriority = OnLoadOrder.Preload + 10)]
 public sealed class PreSpt : IOnLoad
 {
     private readonly ISptLogger<PreSpt> _logger;
@@ -20,7 +20,7 @@ public sealed class PreSpt : IOnLoad
         _state = state;
     }
 
-    public Task OnLoad()
+    public Task OnLoadAsync(CancellationToken cancellationToken)
     {
         try
         {
