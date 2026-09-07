@@ -1,4 +1,5 @@
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
@@ -14,10 +15,17 @@ namespace StatRewards.Services;
 /// Hooks into /client/game/profile/list which fires after raid-end when the player
 /// returns to the main menu. At this point, the profile OverallCounters are fully
 /// updated with the raid's session counters.
+///
+/// Since SPT 4.1.5 this route is STREAMED (StreamedRouteAction in ProfileStaticRouter) and a
+/// streamed payload cannot be passed through between routers - a plain RouteAction returning a
+/// string here wiped the vanilla response and broke profile loading with an UNHANDLED RESPONSE.
+/// The hook therefore runs its side effects and then produces the payload itself by calling the
+/// vanilla callback, which is correct whichever router runs last.
 /// </summary>
 [Injectable]
 public sealed class MilestoneRouter(
     JsonUtil jsonUtil,
+    ProfileCallbacks profileCallbacks,
     ProfileHelper profileHelper,
     MailSendService mailSend,
     StatChecker statChecker,
@@ -26,29 +34,32 @@ public sealed class MilestoneRouter(
     State state,
     ISptLogger<MilestoneRouter> logger
 ) : StaticRouter(jsonUtil, [
-    new RouteAction<EmptyRequestData>(
+    new StreamedRouteAction<EmptyRequestData>(
         "/client/game/profile/list",
-        (url, requestData, sessionId, output, cancellationToken) =>
-            ProcessProfileList(sessionId, output, profileHelper, mailSend,
-                statChecker, rewardGenerator, progressStore, state, logger)
+        async (url, requestData, sessionId, cancellationToken) =>
+        {
+            RunMilestoneChecks(sessionId, profileHelper, mailSend,
+                statChecker, rewardGenerator, progressStore, state, logger);
+            return await profileCallbacks.GetProfileData(url, requestData, sessionId);
+        }
     )
 ])
 {
-    private static ValueTask<string> ProcessProfileList(
-        MongoId sessionId, string? output,
+    private static void RunMilestoneChecks(
+        MongoId sessionId,
         ProfileHelper profileHelper, MailSendService mailSend,
         StatChecker statChecker, RewardGenerator rewardGenerator,
         ProgressStore progressStore, State state,
         ISptLogger<MilestoneRouter> logger)
     {
         if (!state.IsLoaded)
-            return ValueTask.FromResult(output ?? string.Empty);
+            return;
 
         try
         {
             var pmcData = profileHelper.GetPmcProfile(sessionId);
             if (pmcData == null)
-                return ValueTask.FromResult(output ?? string.Empty);
+                return;
 
             var profileId = sessionId.ToString();
             var progress = progressStore.Load(profileId);
@@ -58,7 +69,7 @@ public sealed class MilestoneRouter(
             progressStore.Save(profileId, progress);
 
             if (triggered.Count == 0)
-                return ValueTask.FromResult(output ?? string.Empty);
+                return;
 
             foreach (var (milestone, times) in triggered)
             {
@@ -96,7 +107,5 @@ public sealed class MilestoneRouter(
         {
             logger.Error($"[StatRewards] Error processing raid end: {ex.Message}\n{ex.StackTrace}");
         }
-
-        return ValueTask.FromResult(output ?? string.Empty);
     }
 }
