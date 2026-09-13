@@ -3,7 +3,7 @@
 ![Issues](https://img.shields.io/github/issues/Chazut/StatRewards?style=flat-square&label=ISSUES&color=44cc11)
 ![Downloads](https://img.shields.io/github/downloads/Chazut/StatRewards/total?style=flat-square&label=DOWNLOADS&color=44cc11)
 
-An SPT 4.0 server mod that sends random mail rewards when players hit stat milestones. Repeatable, fully configurable via JSONC.
+An SPT 4.1 server mod that sends random mail rewards when players hit stat milestones. Repeatable, fully configurable via JSONC.
 
 ## Features
 
@@ -18,15 +18,17 @@ An SPT 4.0 server mod that sends random mail rewards when players hit stat miles
 ## Installation
 
 1. Download the latest release
-2. Extract to `SPT/user/mods/StatRewards/`
+2. Extract to `SPT_Runtime/user/mods/StatRewards/`
 3. Ensure the folder structure is:
    ```
-   SPT/user/mods/StatRewards/
+   SPT_Runtime/user/mods/StatRewards/
    ├── StatRewards.dll
    └── config/
        └── mod_config.jsonc
    ```
 4. Start SPT server
+
+An alternative config ships in `addons/random_loot/`: every milestone draws 3 random items from one universal pool. Replace `config/mod_config.jsonc` with it if you prefer that.
 
 ## How It Works
 
@@ -101,11 +103,11 @@ Some stats are stored as `value * 100` internally. Set `"divisor": 100` for thes
 
 ## Building from Source
 
-Requires .NET 9.0 SDK and SPT 4.0 server assemblies.
+Requires the .NET 10 SDK and SPT 4.1 server assemblies.
 
 ```bash
 # Set SPT_DIR to your SPT server root
-dotnet build src/StatRewards/StatRewards.csproj -c Release -p:SPT_DIR="C:\Games\SPT-4.0\SPT"
+dotnet build src/StatRewards/StatRewards.csproj -c Release -p:SPT_DIR="C:\Games\SPT-4.1\SPT_Runtime"
 ```
 
 ## Available Stats

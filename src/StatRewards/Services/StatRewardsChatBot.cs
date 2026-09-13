@@ -1,21 +1,22 @@
-using SPTarkov.Server.Core.Helpers;
-using SPTarkov.Server.Core.Helpers.Dialog.Commando;
 using SPTarkov.Server.Core.Helpers.Dialogue;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
 using StatRewards.Models;
 
 using SPTarkov.DI.Annotations;
 
 namespace StatRewards.Services;
 
+// 4.1: AbstractDialogChatBot.HandleMessage is no longer virtual, so we implement
+// IDialogueChatBot directly (same pattern as SptDialogueChatBot). This bot never
+// used chat commands, so no functionality is lost.
 [Injectable]
-public class StatRewardsChatBot : AbstractDialogChatBot
+public class StatRewardsChatBot : IDialogueChatBot
 {
     private readonly ProfileHelper _profileHelper;
     private readonly ProgressStore _progressStore;
@@ -23,14 +24,11 @@ public class StatRewardsChatBot : AbstractDialogChatBot
     private readonly MailSendService _mail;
 
     public StatRewardsChatBot(
-        ISptLogger<AbstractDialogChatBot> logger,
         MailSendService mailSendService,
-        ServerLocalisationService localisationService,
-        IEnumerable<IChatCommand> chatCommands,
         ProfileHelper profileHelper,
         ProgressStore progressStore,
         State state
-    ) : base(logger, mailSendService, localisationService, chatCommands)
+    )
     {
         _profileHelper = profileHelper;
         _progressStore = progressStore;
@@ -38,7 +36,7 @@ public class StatRewardsChatBot : AbstractDialogChatBot
         _mail = mailSendService;
     }
 
-    public override UserDialogInfo GetChatBot()
+    public UserDialogInfo GetChatBot()
     {
         return new UserDialogInfo
         {
@@ -55,7 +53,7 @@ public class StatRewardsChatBot : AbstractDialogChatBot
         };
     }
 
-    public override ValueTask<string> HandleMessage(MongoId sessionId, SendMessageRequest request)
+    public ValueTask<string> HandleMessage(MongoId sessionId, SendMessageRequest request)
     {
         string response;
 
@@ -81,11 +79,6 @@ public class StatRewardsChatBot : AbstractDialogChatBot
 
         _mail.SendUserMessageToPlayer(sessionId, GetChatBot(), response);
         return ValueTask.FromResult(request.DialogId);
-    }
-
-    protected override string GetUnrecognizedCommandMessage()
-    {
-        return "Send me any message to see your milestone progress!";
     }
 
     private string BuildProgressReport(MilestoneProgress progress, IEnumerable<CounterKeyValue>? counters)
