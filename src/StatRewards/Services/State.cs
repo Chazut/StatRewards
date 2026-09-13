@@ -3,7 +3,7 @@ using StatRewards.Models;
 
 namespace StatRewards.Services;
 
-[Injectable]
+[Injectable(InjectionType.Singleton)]
 public sealed class State
 {
     public ModConfig Config { get; private set; } = new();
