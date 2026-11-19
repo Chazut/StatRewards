@@ -1,6 +1,8 @@
 {
   // Set to true for verbose logging
   "debug": false,
+  // Prefer different categories and item templates within each mail.
+  "varied_parcels": true,
 
   // Global multiplier applied to all milestone thresholds
   // 0.5 = rewards twice as often, 2.0 = rewards half as often

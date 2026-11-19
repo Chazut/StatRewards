@@ -42,7 +42,7 @@ public sealed class PreSpt : IOnLoad
         return Task.CompletedTask;
     }
 
-    private static string FindConfigPath()
+    internal static string FindConfigPath()
     {
         var asmDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
             ?? AppContext.BaseDirectory;

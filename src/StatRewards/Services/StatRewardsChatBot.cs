@@ -91,7 +91,7 @@ public class StatRewardsChatBot : IDialogueChatBot
             if (string.IsNullOrEmpty(milestone.stat_key) || milestone.every <= 0)
                 continue;
 
-            var effectiveEvery = Math.Max(1, (long)(milestone.every * _state.Config.threshold_multiplier));
+            var effectiveEvery = milestone.Interval(_state.Config.threshold_multiplier);
 
             long currentValue = 0;
             if (counters != null)
@@ -100,8 +100,9 @@ public class StatRewardsChatBot : IDialogueChatBot
                 currentValue /= milestone.divisor;
 
             var lastThreshold = progress.milestones.GetValueOrDefault(milestone.id, 0);
-            var nextThreshold = lastThreshold + effectiveEvery;
-            var progressToNext = currentValue - lastThreshold;
+            var previousBoundary = lastThreshold / effectiveEvery * effectiveEvery;
+            var nextThreshold = previousBoundary + effectiveEvery;
+            var progressToNext = currentValue - previousBoundary;
             var pct = (double)progressToNext / effectiveEvery * 100;
             if (pct < 0) pct = 0;
             if (pct > 100) pct = 100;

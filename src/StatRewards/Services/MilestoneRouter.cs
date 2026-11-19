@@ -73,7 +73,7 @@ public sealed class MilestoneRouter(
 
             foreach (var (milestone, times) in triggered)
             {
-                var items = rewardGenerator.Generate(milestone, times);
+                var items = rewardGenerator.Generate(milestone, times, state.Config.varied_parcels);
                 if (items.Count == 0) continue;
 
                 var sender = !string.IsNullOrEmpty(milestone.sender)
@@ -81,7 +81,7 @@ public sealed class MilestoneRouter(
                     : "54cb50c76803fa8b248b4571"; // Prapor fallback
 
                 // Calculate milestone number from saved progress
-                var effectiveEvery = Math.Max(1, (long)(milestone.every * state.Config.threshold_multiplier));
+                var effectiveEvery = milestone.Interval(state.Config.threshold_multiplier);
                 var milestoneNumber = progress.milestones.TryGetValue(milestone.id, out var threshold)
                     ? threshold / effectiveEvery
                     : 0;

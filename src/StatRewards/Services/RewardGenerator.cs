@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers.Items;
@@ -21,7 +22,8 @@ public sealed class RewardGenerator
     private readonly ISptLogger<RewardGenerator> _logger;
 
     // Cached category pools (lazy-loaded)
-    private Dictionary<string, List<MongoId>>? _categoryPools;
+    private readonly ConcurrentDictionary<string, List<MongoId>> _categoryPools = new();
+    private readonly ConcurrentDictionary<MongoId, string> _fixedGroups = new();
 
     // Base class IDs for each category
     private static readonly Dictionary<string, string[]> CategoryBaseClasses = new()
@@ -74,154 +76,122 @@ public sealed class RewardGenerator
         _logger = logger;
     }
 
-    public List<Item> Generate(MilestoneDefinition milestone, int times = 1)
+    public List<Item> Generate(MilestoneDefinition milestone, int times = 1, bool varied = true)
     {
         var items = new List<Item>();
-        if (milestone.reward_pool.Count == 0) return items;
-
-        var random = new Random();
-        var totalWeight = milestone.reward_pool.Sum(r => r.weight);
-        if (totalWeight <= 0) return items;
-
-        for (int t = 0; t < times; t++)
+        Roll(milestone, times, varied, long.MaxValue, (template, amount, preset) =>
         {
-            for (int i = 0; i < milestone.reward_count; i++)
+            if (preset == null) AddStackableItem(items, template.ToString(), amount);
+            else
             {
-                var selected = PickWeighted(milestone.reward_pool, totalWeight, random);
-                if (selected == null) continue;
-
-                if (!string.IsNullOrEmpty(selected.category))
-                    GenerateCategoryReward(items, selected, random);
-                else if (!string.IsNullOrEmpty(selected.template_id))
-                    GenerateSpecificReward(items, selected, random);
-            }
-        }
-        return items;
-    }
-
-    private void GenerateCategoryReward(List<Item> items, RewardPoolEntry entry, Random random)
-    {
-        var category = entry.category!;
-
-        // Special case: money
-        if (category == "money")
-        {
-            var amount = entry.min_stack == entry.max_stack
-                ? entry.min_stack
-                : random.Next(entry.min_stack, entry.max_stack + 1);
-            AddStackableItem(items, RoublesTpl, amount);
-            return;
-        }
-
-        // Special case: weapon with preset
-        if (category == "weapon_preset")
-        {
-            GenerateWeaponPresetReward(items);
-            return;
-        }
-
-        // Special case: gear — use preset for armor with plates/inserts
-        if (category == "gear")
-        {
-            GenerateGearReward(items);
-            return;
-        }
-
-        // Standard category: pick random item from pool
-        var pool = GetCategoryPool(category);
-        if (pool.Count == 0)
-        {
-            _logger.Warning($"[StatRewards] Empty pool for category '{category}'");
-            return;
-        }
-
-        var tpl = _randomUtil.GetArrayValue(pool);
-
-        // Ammo: always give a full stack
-        if (category == "ammo")
-        {
-            var maxStack = GetMaxStackSize(tpl.ToString());
-            AddStackableItem(items, tpl.ToString(), maxStack);
-            return;
-        }
-
-        var stack = entry.min_stack == entry.max_stack
-            ? entry.min_stack
-            : random.Next(entry.min_stack, entry.max_stack + 1);
-
-        AddStackableItem(items, tpl.ToString(), stack);
-    }
-
-    private void GenerateWeaponPresetReward(List<Item> items)
-    {
-        // Build weapon pool if needed, then pick a random weapon that has a default preset
-        var weaponPool = GetCategoryPool("_weapons_with_presets");
-        if (weaponPool.Count == 0)
-        {
-            _logger.Warning("[StatRewards] No weapons with presets found");
-            return;
-        }
-
-        // Try up to 10 times to find a weapon with a valid preset
-        for (int attempt = 0; attempt < 10; attempt++)
-        {
-            var weaponTpl = _randomUtil.GetArrayValue(weaponPool);
-            var preset = _presetHelper.GetDefaultPreset(weaponTpl);
-            if (preset?.Items == null || preset.Items.Count == 0) continue;
-
-            var presetItems = preset.Items.ReplaceIDs().ToList();
-            presetItems.RemapRootItemId();
-            _itemHelper.SetFoundInRaid(presetItems);
-            items.AddRange(presetItems);
-            return;
-        }
-    }
-
-    private void GenerateGearReward(List<Item> items)
-    {
-        var pool = GetCategoryPool("gear");
-        if (pool.Count == 0) return;
-
-        for (int attempt = 0; attempt < 10; attempt++)
-        {
-            var tpl = _randomUtil.GetArrayValue(pool);
-
-            // Check if armor needs plates/inserts — use preset if available
-            if (_itemHelper.ArmorItemHasRemovableOrSoftInsertSlots(tpl))
-            {
-                var preset = _presetHelper.GetDefaultPreset(tpl);
-                if (preset?.Items == null || preset.Items.Count == 0)
-                {
-                    // No preset for this armor, try another
-                    continue;
-                }
-
-                var presetItems = preset.Items.ReplaceIDs().ToList();
+                var presetItems = preset.ReplaceIDs().ToList();
                 presetItems.RemapRootItemId();
                 _itemHelper.SetFoundInRaid(presetItems);
                 items.AddRange(presetItems);
-                return;
             }
+        });
+        return items;
+    }
 
-            // Non-modular gear (backpack, headwear, simple rig) — just add it
-            items.Add(new Item
-            {
-                Id = new MongoId(Guid.NewGuid().ToString("N")[..24]),
-                Template = tpl,
-                Upd = new Upd { StackObjectsCount = 1 }
-            });
+    public List<(MongoId Template, int Amount)> Preview(MilestoneDefinition milestone, bool varied)
+    {
+        var sample = new List<(MongoId, int)>();
+        Roll(milestone, 1, varied, 6, (id, amount, _) => sample.Add((id, amount)));
+        return sample;
+    }
+
+    private void Roll(MilestoneDefinition milestone, int times, bool varied, long limit,
+        Action<MongoId, int, List<Item>?> accept)
+    {
+        if (milestone.reward_pool.Count == 0) return;
+        var random = Random.Shared;
+        var draws = Math.Min(limit, (long)times * milestone.reward_count);
+        if (varied)
+        {
+            var sources = milestone.reward_pool.Where(e => e.weight > 0 && double.IsFinite(e.weight))
+                .Select(ResolveSource).ToList();
+            var parcel = new VariedParcel(sources, random);
+            for (long i = 0; i < draws; i++)
+                if (!parcel.Draw((entry, template) => TryRoll(entry, template, random, accept))) break;
             return;
+        }
+
+        var totalWeight = milestone.reward_pool.Sum(r => r.weight);
+        if (totalWeight <= 0) return;
+        for (long i = 0; i < draws; i++)
+        {
+            var entry = PickWeighted(milestone.reward_pool, totalWeight, random);
+            if (entry == null) continue;
+            if (string.IsNullOrEmpty(entry.category))
+            {
+                if (!string.IsNullOrEmpty(entry.template_id))
+                    TryRoll(entry, new MongoId(entry.template_id), random, accept);
+                continue;
+            }
+            var source = ResolveSource(entry);
+            if (source.Templates.Count == 0)
+            {
+                _logger.Warning($"[StatRewards] Empty pool for category '{entry.category}'");
+                continue;
+            }
+            int attempts = entry.category is "gear" or "weapon_preset" ? 10 : 1;
+            for (int attempt = 0; attempt < attempts; attempt++)
+            {
+                var template = source.Templates.Count == 1 ? source.Templates[0] : _randomUtil.GetArrayValue(source.Templates);
+                if (TryRoll(entry, template, random, accept)) break;
+            }
         }
     }
 
-    private void GenerateSpecificReward(List<Item> items, RewardPoolEntry entry, Random random)
+    private RewardSource ResolveSource(RewardPoolEntry entry)
     {
-        var stack = entry.min_stack == entry.max_stack
-            ? entry.min_stack
-            : random.Next(entry.min_stack, entry.max_stack + 1);
-
-        AddStackableItem(items, entry.template_id!, stack);
+        if (string.IsNullOrEmpty(entry.category))
+        {
+            if (entry.template_id is { } id && MongoId.IsValidMongoId(id) && _templates.Items.ContainsKey(id))
+                return new(entry, _fixedGroups.GetOrAdd(id, ItemGroup), [new MongoId(id)]);
+            return new(entry, "", []);
+        }
+        return entry.category switch
+        {
+            "money" => new(entry, "money", [new MongoId(RoublesTpl)]),
+            "weapon_preset" => new(entry, "weapon_preset", GetCategoryPool("_weapons_with_presets")),
+            _ => new(entry, entry.category, GetCategoryPool(entry.category))
+        };
     }
+
+    private string ItemGroup(MongoId template)
+    {
+        if (template == new MongoId(RoublesTpl)) return "money";
+        if (_itemHelper.IsOfBaseclass(template, BaseClasses.WEAPON)) return "weapon_preset";
+        foreach (var (category, parents) in CategoryBaseClasses)
+            if (parents.Any(parent => _itemHelper.IsOfBaseclass(template, parent))) return category;
+        return _templates.Items[template].Parent.ToString();
+    }
+
+    private bool TryRoll(RewardPoolEntry entry, MongoId template, Random random, Action<MongoId, int, List<Item>?> accept)
+    {
+        bool gear = entry.category == "gear";
+        if (entry.category == "weapon_preset" || (gear && _itemHelper.ArmorItemHasRemovableOrSoftInsertSlots(template)))
+        {
+            var preset = _presetHelper.GetDefaultPreset(template);
+            if (preset?.Items is not { Count: > 0 }) return false;
+            accept(template, 1, preset.Items);
+            return true;
+        }
+
+        var amount = entry.category switch
+        {
+            "gear" => 1,
+            "ammo" => GetMaxStackSize(template.ToString()),
+            _ => StackSize(entry, random)
+        };
+        accept(template, amount, null);
+        return true;
+    }
+
+    private static int StackSize(RewardPoolEntry entry, Random random) =>
+        entry.min_stack == entry.max_stack ? entry.min_stack
+            : (int)random.NextInt64(entry.min_stack, (long)entry.max_stack + 1);
 
     private void AddStackableItem(List<Item> items, string templateId, int totalStack)
     {
@@ -242,18 +212,12 @@ public sealed class RewardGenerator
 
     private List<MongoId> GetCategoryPool(string category)
     {
-        _categoryPools ??= new Dictionary<string, List<MongoId>>();
-
-        if (_categoryPools.TryGetValue(category, out var cached))
-            return cached;
-
-        var pool = category == "_weapons_with_presets"
-            ? BuildWeaponPresetPool()
-            : BuildBaseClassPool(category);
-
-        _categoryPools[category] = pool;
-        _logger.Info($"[StatRewards] Built pool for '{category}': {pool.Count} items");
-        return pool;
+        return _categoryPools.GetOrAdd(category, key =>
+        {
+            var pool = key == "_weapons_with_presets" ? BuildWeaponPresetPool() : BuildBaseClassPool(key);
+            _logger.Info($"[StatRewards] Built pool for '{key}': {pool.Count} items");
+            return pool;
+        });
     }
 
     private List<MongoId> BuildBaseClassPool(string category)
@@ -324,7 +288,7 @@ public sealed class RewardGenerator
     private int GetMaxStackSize(string templateId)
     {
         if (_templates.Items.TryGetValue(templateId, out var template))
-            return template.Properties?.StackMaxSize ?? 1;
+            return Math.Max(1, template.Properties?.StackMaxSize ?? 1);
         return 1;
     }
 }

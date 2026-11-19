@@ -1,0 +1,116 @@
+@page "/statrewards"
+@namespace StatRewards.Web
+@using Microsoft.AspNetCore.Components.Web
+@using StatRewards.Models
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Administrator")]
+
+<PageTitle>StatRewards | Milestones and parcels</PageTitle>
+<style>@((MarkupString)Styles)</style>
+<main class="sr-shell">
+    <header class="sr-header"><img src="@Icon" alt="" width="64" height="64" />
+        <div><h1>StatRewards</h1><p>Milestones &amp; reward parcels</p></div>
+    </header>
+    @if (draft == null)
+    {
+        <p role="alert">@status</p><button @onclick="Reload">Reload settings</button>
+    }
+    else
+    {
+        <form @onsubmit="Save" @onsubmit:preventDefault @oninput="ClearSample" @onchange="ClearSample">
+            <section class="sr-global">
+                <div>
+                    <label class="sr-switch"><input type="checkbox" @bind="draft.varied_parcels" /> <strong>Varied parcels</strong></label>
+                    <p>Prefer different items and categories in each parcel. Repeats fill the remaining draws once the pool runs out.</p>
+                </div>
+                <label>Milestone interval multiplier
+                    <input type="number" required min="0" step="any" @bind="draft.threshold_multiplier" />
+                    <small>0.5 = twice as often · 2 = half as often</small>
+                </label>
+            </section>
+
+            <div class="sr-layout">
+                <section class="sr-card sr-library">
+                    <h2>Milestones <small>@draft.milestones.Count</small></h2>
+                    <input aria-label="Find milestone" type="search" placeholder="Find a name or stat" @bind="search" @bind:event="oninput" />
+                    <nav aria-label="Milestones">
+                        @foreach (var milestone in Filtered)
+                        {
+                            <button type="button" class="sr-choice" aria-pressed="@(ReferenceEquals(selected, milestone) ? "true" : "false")" @onclick="() => Select(milestone)">
+                                <strong>@Name(milestone)</strong><small>@Stat(milestone)</small>
+                            </button>
+                        }
+                        @if (!Filtered.Any()) { <p>No matching milestones.</p> }
+                    </nav>
+                </section>
+
+                @if (selected is { } m)
+                {
+                    <section class="sr-card sr-editor" aria-label="Milestone settings">
+                        <h2>@Name(m)</h2>
+                        <p class="sr-interval">@Stat(m) · @(m.every == 0 ? "Paused" : $"Every {m.Interval(draft.threshold_multiplier):N0} after multiplier")</p>
+                        <div class="sr-pair">
+                            <label>Base interval<input title="Set to 0 to pause this milestone" type="number" min="0" required step="1" @bind="m.every" /></label>
+                            <label>Draws per milestone<input type="number" min="0" required step="1" @bind="m.reward_count" /></label>
+                        </div>
+                        <div class="sr-line"><h3>Reward pool</h3><button type="button" class="sr-link" @onclick="AddReward">+ Add reward</button></div>
+                        <div class="sr-pool">
+                            @for (var i = 0; i < m.reward_pool.Count; i++)
+                            {
+                                var index = i;
+                                var e = m.reward_pool[i];
+                                <div class="sr-entry" @key="index">
+                                    <label>Reward
+                                        <select aria-label="@($"Reward {i + 1} type")" value="@(e.category ?? "")" @onchange="ev => SetKind(e, ev.Value?.ToString())">
+                                            @foreach (var kind in Kinds) { <option value="@kind.Key">@kind.Value</option> }
+                                            @if (e.category is { Length: > 0 } custom && !Kinds.ContainsKey(custom)) { <option value="@custom">@custom</option> }
+                                        </select>
+                                    </label>
+                                    <label>Weight<input aria-label="@($"Reward {i + 1} weight")" type="number" required min="0" step="any" @bind="e.weight" /></label>
+                                    <div class="sr-share"><small>First draw*</small><strong>@Chance(m,e)</strong></div>
+                                    <button type="button" class="sr-remove" title="Remove reward" aria-label="@($"Remove reward {i + 1}")" @onclick="() => RemoveReward(index)">×</button>
+                                    @if (e.category is "weapon_preset" or "gear" or "ammo")
+                                    {
+                                        <small class="sr-stack">@StackCaption(e)</small>
+                                    }
+                                    else
+                                    {
+                                        <details class="sr-stack" open="@(string.IsNullOrEmpty(e.category) ? true : (bool?)null)" @key="(index,e.category)">
+                                            <summary>@StackCaption(e)</summary>
+                                            @if (string.IsNullOrEmpty(e.category))
+                                            {
+                                                <label>Item template ID<input required pattern="[a-fA-F0-9]{24}" @bind="e.template_id" /></label>
+                                            }
+                                            <div class="sr-pair">
+                                                <label>Min. quantity<input type="number" min="1" required step="1" @bind="e.min_stack" /></label>
+                                                <label>Max. quantity<input type="number" min="1" required step="1" @bind="e.max_stack" /></label>
+                                            </div>
+                                        </details>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <small>*Share of the configured weight. Empty categories can change the actual odds.</small>
+                        <div class="sr-sample">
+                            <button type="button" @onclick="Sample">Preview parcel</button>
+                            <span>Sample up to 6 draws</span>
+                            @if (sample != null)
+                            {
+                                <ul aria-label="Sample parcel">@foreach (var item in sample) { <li>@item</li> }</ul>
+                            }
+                        </div>
+                        <details class="sr-mail"><summary>Milestone name and trader mail</summary>
+                            <label>Display name<input @bind="m.name" /></label>
+                            <label>Sender (trader ID)<input pattern="[a-fA-F0-9]{24}" placeholder="Prapor" @bind="m.sender" /></label>
+                            <label>Mail message<textarea rows="2" @bind="m.message"></textarea></label>
+                        </details>
+                    </section>
+                }
+            </div>
+            <footer>
+                <div><label><input type="checkbox" @bind="draft.debug" /> Verbose server logs</label><small>Saved changes apply on the next server start.</small></div>
+                <button type="button" @onclick="Reload">Reload saved</button><button type="submit" class="sr-primary">Save settings</button>
+            </footer>
+            <p role="status" class="sr-status">@status</p>
+        </form>
+    }
+</main>

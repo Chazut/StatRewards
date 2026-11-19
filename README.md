@@ -1,19 +1,23 @@
 # StatRewards
+
+<img src="branding/stat-rewards.png" alt="StatRewards orbital supply parcel" width="88" />
+
 ![Stars](https://img.shields.io/github/stars/Chazut/StatRewards?style=flat-square&label=STARS&color=007ec6)
 ![Issues](https://img.shields.io/github/issues/Chazut/StatRewards?style=flat-square&label=ISSUES&color=44cc11)
 ![Downloads](https://img.shields.io/github/downloads/Chazut/StatRewards/total?style=flat-square&label=DOWNLOADS&color=44cc11)
 
-An SPT 4.1 server mod that sends random mail rewards when players hit stat milestones. Repeatable, fully configurable via JSONC.
+Earn supply parcels from traders when you hit repeatable milestones in SPT 4.1. Open StatRewards in the SPT web interface to choose how often rewards arrive and what goes in them.
 
 ## Features
 
-- **48 milestones** covering kills, damage, healing, looting, economy, exploration, and weapon-type stats
+- **46 milestones in the default configuration** covering kills, damage, healing, looting, economy, exploration, and weapon-type stats
 - **Category-based random rewards** — meds, ammo, gear, keys, barter items, money, food, drinks
 - **Weapon rewards with attachments** — weapons come with their default preset (stock configuration with base mods)
 - **Armor preset rewards** — armor with plates and inserts included
 - **Full ammo stacks** — ammo rewards always give a complete stack
 - **Per-profile progress tracking** — no retroactive reward flood on first install
-- **Fully configurable** — add, remove, or tweak milestones and reward pools via `config/mod_config.jsonc`
+- **Varied parcels** mix categories and avoid duplicate items when your reward pool allows it
+- **Web settings** let you edit milestones and preview a parcel before saving
 
 ## Installation
 
@@ -28,7 +32,7 @@ An SPT 4.1 server mod that sends random mail rewards when players hit stat miles
    ```
 4. Start SPT server
 
-An alternative config ships in `addons/random_loot/`: every milestone draws 3 random items from one universal pool. Replace `config/mod_config.jsonc` with it if you prefer that.
+An alternative config ships in `addons/random_loot/`: all 48 milestones draw 3 random items from one shared pool. Replace `config/mod_config.jsonc` with it if you prefer that.
 
 ## How It Works
 
@@ -38,9 +42,15 @@ Milestones are **repeatable** — for example, a milestone set to `"every": 25` 
 
 On first install, milestones are **seeded** to your current stats so you don't receive a flood of retroactive rewards.
 
-## Configuration
+## Web settings
 
-Edit `config/mod_config.jsonc` to customize milestones and rewards. The file supports JSONC (comments and trailing commas).
+Open **StatRewards** in the SPT web interface (`/statrewards`) with an administrator account. Find a milestone by name or tracked stat to edit its interval, sender, number of draws and reward pool. **Preview parcel** shows up to six sample draws from your item database, including quantities. Click **Save settings** and restart the SPT server to apply your changes.
+
+**Varied parcels** is on by default, including for existing configurations. For example, if a parcel has three draws and its pool offers meds, ammo and roubles, you get one of each. Weights decide between eligible entries. With only meds available, the mod picks different medical items until it runs out of choices. Several triggers of the same milestone delivered in one mail share the same draw history. Turn the option off to draw independently each time.
+
+## Configuration file
+
+To add or remove milestone definitions, edit `config/mod_config.jsonc`. The file supports comments and trailing commas.
 
 ### Milestone Structure
 

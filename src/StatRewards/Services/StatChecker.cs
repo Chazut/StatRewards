@@ -38,7 +38,7 @@ public sealed class StatChecker
             var currentValue = milestone.divisor > 1 ? rawValue / milestone.divisor : rawValue;
 
             // Apply global threshold multiplier (e.g. 0.5 = half thresholds, 2.0 = double)
-            var effectiveEvery = Math.Max(1, (long)(milestone.every * config.threshold_multiplier));
+            var effectiveEvery = milestone.Interval(config.threshold_multiplier);
             var currentThreshold = (currentValue / effectiveEvery) * effectiveEvery;
 
             // First time seeing this milestone: seed to current value, no retroactive rewards
@@ -53,7 +53,7 @@ public sealed class StatChecker
             var lastThreshold = progress.milestones[milestone.id];
             if (currentThreshold > lastThreshold)
             {
-                var times = (int)((currentThreshold - lastThreshold) / effectiveEvery);
+                var times = (int)(currentThreshold / effectiveEvery - lastThreshold / effectiveEvery);
                 triggered.Add((milestone, times));
                 progress.milestones[milestone.id] = currentThreshold;
 

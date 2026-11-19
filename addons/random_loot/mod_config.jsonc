@@ -6,6 +6,8 @@
 
 {
   "debug": false,
+  // Prefer different categories and item templates within each mail.
+  "varied_parcels": true,
   "threshold_multiplier": 1.0,
   "milestones": [
     {

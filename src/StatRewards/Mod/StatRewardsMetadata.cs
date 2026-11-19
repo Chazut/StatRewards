@@ -4,7 +4,7 @@ using SemVerRange = SemanticVersioning.Range;
 
 namespace StatRewards.Mod;
 
-public sealed record StatRewardsMetadata : IModMetadata
+public sealed record StatRewardsMetadata : IModMetadata, SPTarkov.Server.Web.IModBlazorMetadata
 {
     public string ModGuid { get; init; } = "com.chazut.statrewards";
     public string Name { get; init; } = "StatRewards";
@@ -16,5 +16,8 @@ public sealed record StatRewardsMetadata : IModMetadata
     public List<string>? Incompatibilities { get; init; }
     public Dictionary<string, SemVerRange>? ModDependencies { get; init; }
     public string? Url { get; init; } = "https://github.com/Chazut/StatRewards";
+    public string? WWWRootUrl { get; init; }
+    public string? HomePage { get; init; } = "/statrewards";
+    public string? HomePageDescription { get; init; } = "Configure milestones and reward parcels";
     public string License { get; init; } = "MIT";
 }
