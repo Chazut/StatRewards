@@ -22,7 +22,7 @@ Earn supply parcels from traders when you hit repeatable milestones in SPT 4.1. 
 ## Installation
 
 1. Download the latest release
-2. Extract to `SPT_Runtime/user/mods/StatRewards/`
+2. Extract the ZIP into your SPT game folder (next to `EscapeFromTarkov.exe`). On upgrade, keep your existing `config/mod_config.jsonc` when prompted.
 3. Ensure the folder structure is:
    ```
    SPT_Runtime/user/mods/StatRewards/
